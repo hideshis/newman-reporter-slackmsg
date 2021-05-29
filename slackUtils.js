@@ -150,8 +150,8 @@ function getSkipCount(executions) {
         if (execution.assertions) {
             if (execution.assertions[0].skipped) {
                 acc = acc + 1;
-            };
-        };
+            }
+        }
         return acc;
     }, 0);
 }
@@ -160,9 +160,16 @@ function getSkipCount(executions) {
 // Takes fail report and parse it for further processing
 function parseFailures(failures) {
     return failures.reduce((acc, failure, index) => {
+        let request_path = "";
+        if (failure.parent.name) {
+            request_path = failure.parent.name + "/" + failure.source.name;
+        } else {
+            request_path = failure.source.name;
+        }
+
         if (index === 0) {
             acc.push({
-                name: failure.source.name || 'No Name',
+                name: request_path || 'No Name',
                 tests: [{
                     name: failure.error.name || 'No test name',
                     test: failure.error.test || 'connection error',
@@ -171,7 +178,7 @@ function parseFailures(failures) {
             });
         } else if (acc[acc.length - 1].name !== failure.source.name) {
             acc.push({
-                name: failure.source.name || 'No Name',
+                name: request_path || 'No Name',
                 tests: [{
                     name: failure.error.name || 'No test name',
                     test: failure.error.test || 'connection error',
